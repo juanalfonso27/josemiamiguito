@@ -1,592 +1,236 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comparador de Cargas de Granos</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 600;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .toolbar {
-            background: #f8f9fa;
-            padding: 20px 30px;
-            border-bottom: 2px solid #e9ecef;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.8em;
-            border-left: 5px solid #667eea;
-            padding-left: 15px;
-        }
-
-        h3 {
-            color: #34495e;
-            margin: 20px 0 10px 0;
-            font-size: 1.3em;
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 20px;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 10px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        td {
-            border: 1px solid #e9ecef;
-            padding: 12px 10px;
-            text-align: center;
-            font-size: 13px;
-        }
-
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        .result {
-            font-weight: bold;
-            color: #27ae60;
-            font-size: 1.1em;
-        }
-
-        #editor,
-        #relatorio {
-            border: 2px solid #667eea;
-            padding: 30px;
-            margin-top: 30px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="date"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        input[type="date"]:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .results-box {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            border: 2px solid #27ae60;
-        }
-
-        .results-box div {
-            margin: 10px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .results-box label {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .borrador {
-            background: #fff3cd !important;
-        }
-
-        .aplicado {
-            background: #d4edda !important;
-        }
-
-        .descAlto {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
-        }
-
-        .filters-box {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 2px solid #e9ecef;
-        }
-
-        .summary-box {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 2px solid #2196f3;
-        }
-
-        .summary-box p {
-            margin: 10px 0;
-            font-size: 1.1em;
-            color: #2c3e50;
-        }
-
-        .summary-box strong {
-            color: #667eea;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.8em;
-            }
-
-            .toolbar {
-                justify-content: center;
-            }
-
-            table {
-                font-size: 11px;
-            }
-
-            th, td {
-                padding: 8px 5px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparador de Cargas de Granos</title>
+<style>
+body { font-family: Arial; margin:20px; background:#f8f8f8; }
+h1, h2, h3 { margin:5px 0; }
+button { margin:3px; padding:5px 10px; cursor:pointer; }
+table { border-collapse: collapse; width: 100%; margin-top:10px; background:#fff; }
+th, td { border: 1px solid #ccc; padding: 5px; text-align:center; }
+.result { font-weight:bold; color:green; }
+#editor, #relatorio { border:1px solid #ccc; padding:10px; margin-top:20px; background:#fff; }
+.borrador { background:#fff3cd; }
+.aplicado { background:#d4edda; }
+.descAlto { color:red; font-weight:bold; }
+</style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🌾 Comparador de Cargas de Granos</h1>
-        </div>
 
-        <div class="toolbar">
-            <button onclick="nuevo()">➕ Nueva Carga</button>
-            <button onclick="verRelatorio()">📊 Ver Relatorio Diario</button>
-        </div>
+<h1>Comparador de Cargas de Granos</h1>
 
-        <div class="content">
-            <h2>Lista de Cargas</h2>
-            <table id="tablaCargas">
-                <tr>
-                    <th>ID</th>
-                    <th>Camión</th>
-                    <th>Chofer</th>
-                    <th>Entidad</th>
-                    <th>Peso Salida</th>
-                    <th>Peso Llegada</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </table>
-        </div>
+<button onclick="nuevo()">Nuevo</button>
+<button onclick="verRelatorio()">Ver Relatorio Diario</button>
 
-        <div id="editor" style="display:none;">
-            <h2>✏️ Editar Carga</h2>
+<h2>Lista de Cargas</h2>
+<table id="tablaCargas">
+<tr>
+<th>ID</th><th>Camión</th><th>Chofer</th><th>Entidad</th><th>Peso Salida</th><th>Peso Llegada</th><th>Estado</th><th>Acciones</th>
+</tr>
+</table>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Camión:</label>
-                    <input id="camion" type="text">
-                </div>
-                <div class="form-group">
-                    <label>Chofer:</label>
-                    <input id="chofer" type="text">
-                </div>
-                <div class="form-group">
-                    <label>Entidad:</label>
-                    <input id="entidad" type="text">
-                </div>
-            </div>
+<div id="editor" style="display:none;">
+<h2>Editar Carga</h2>
 
-            <h3>📤 Datos de salida</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Peso (kg):</label>
-                    <input id="pesoSalida" type="number">
-                </div>
-                <div class="form-group">
-                    <label>Humedad (%):</label>
-                    <input id="humSalida" type="number">
-                </div>
-                <div class="form-group">
-                    <label>Impureza (%):</label>
-                    <input id="impSalida" type="number">
-                </div>
-                <div class="form-group">
-                    <label>Calidad (%):</label>
-                    <input id="calSalida" type="number">
-                </div>
-            </div>
+Camión: <input id="camion" type="text"><br>
+Chofer: <input id="chofer" type="text"><br>
+Entidad: <input id="entidad" type="text"><br>
 
-            <h3>📥 Datos de llegada</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Peso (kg):</label>
-                    <input id="pesoLlegada" type="number" oninput="calcular()">
-                </div>
-                <div class="form-group">
-                    <label>Humedad (%):</label>
-                    <input id="humLlegada" type="number" oninput="calcular()">
-                </div>
-                <div class="form-group">
-                    <label>Impureza (%):</label>
-                    <input id="impLlegada" type="number" oninput="calcular()">
-                </div>
-                <div class="form-group">
-                    <label>Calidad (%):</label>
-                    <input id="calLlegada" type="number" oninput="calcular()">
-                </div>
-            </div>
+<h3>Datos de salida</h3>
+Peso (kg): <input id="pesoSalida" type="number"><br>
+Humedad (%): <input id="humSalida" type="number"><br>
+Impureza (%): <input id="impSalida" type="number"><br>
+Calidad (%): <input id="calSalida" type="number"><br>
 
-            <h3>📉 Descuentos manuales (%)</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Humedad:</label>
-                    <input id="descHum" type="number" value="0" oninput="calcular()">
-                </div>
-                <div class="form-group">
-                    <label>Impureza:</label>
-                    <input id="descImp" type="number" value="0" oninput="calcular()">
-                </div>
-                <div class="form-group">
-                    <label>Calidad:</label>
-                    <input id="descCal" type="number" value="0" oninput="calcular()">
-                </div>
-            </div>
+<h3>Datos de llegada</h3>
+Peso (kg): <input id="pesoLlegada" type="number" oninput="calcular()"><br>
+Humedad (%): <input id="humLlegada" type="number" oninput="calcular()"><br>
+Impureza (%): <input id="impLlegada" type="number" oninput="calcular()"><br>
+Calidad (%): <input id="calLlegada" type="number" oninput="calcular()"><br>
 
-            <div class="results-box">
-                <h3>✅ Resultados automáticos</h3>
-                <div>
-                    <label>Diferencia de peso:</label>
-                    <span id="difPeso" class="result">0</span>
-                </div>
-                <div>
-                    <label>Kg Desc Hum:</label>
-                    <span id="kgHum" class="result">0</span>
-                </div>
-                <div>
-                    <label>Kg Desc Imp:</label>
-                    <span id="kgImp" class="result">0</span>
-                </div>
-                <div>
-                    <label>Kg Desc Cal:</label>
-                    <span id="kgCal" class="result">0</span>
-                </div>
-                <div>
-                    <label>Total Descuento:</label>
-                    <span id="totalDesc" class="result">0</span>
-                </div>
-            </div>
+<h3>Descuentos manuales (%)</h3>
+Humedad: <input id="descHum" type="number" value="0" oninput="calcular()"><br>
+Impureza: <input id="descImp" type="number" value="0" oninput="calcular()"><br>
+Calidad: <input id="descCal" type="number" value="0" oninput="calcular()"><br>
 
-            <div class="button-group">
-                <button class="btn-success" onclick="guardar()">💾 Guardar</button>
-                <button class="btn-secondary" onclick="cerrarEditor()">❌ Cancelar</button>
-            </div>
-        </div>
+<h3>Resultados automáticos</h3>
+Diferencia de peso: <span id="difPeso" class="result">0</span><br>
+Kg Desc Hum: <span id="kgHum" class="result">0</span><br>
+Kg Desc Imp: <span id="kgImp" class="result">0</span><br>
+Kg Desc Cal: <span id="kgCal" class="result">0</span><br>
+Total Descuento: <span id="totalDesc" class="result">0</span><br>
 
-        <div id="relatorio" style="display:none;">
-            <h2>📊 Relatorio Diario</h2>
+<button onclick="guardar()">Guardar</button>
+<button onclick="cerrarEditor()">Cancelar</button>
+</div>
 
-            <div class="filters-box">
-                <h3>🔍 Filtros</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Fecha:</label>
-                        <input type="date" id="filtroFecha">
-                    </div>
-                    <div class="form-group">
-                        <label>Entidad:</label>
-                        <input type="text" id="filtroEntidad" placeholder="Nombre de la entidad">
-                    </div>
-                </div>
-                <div class="button-group">
-                    <button onclick="verRelatorio()">🔄 Aplicar filtro</button>
-                    <button class="btn-warning" onclick="imprimirRelatorio()">🖨️ Imprimir</button>
-                    <button class="btn-secondary" onclick="cerrarRelatorio()">❌ Cerrar</button>
-                </div>
-            </div>
+<div id="relatorio" style="display:none;">
+<h2>Relatorio Diario</h2>
 
-            <div id="resumen" class="summary-box"></div>
-            <table id="tablaRelatorio"></table>
-        </div>
-    </div>
+<h3>Filtros</h3>
+Fecha: <input type="date" id="filtroFecha">
+Entidad: <input type="text" id="filtroEntidad" placeholder="Nombre de la entidad">
+<button onclick="verRelatorio()">Aplicar filtro</button>
+<button onclick="imprimirRelatorio()">Imprimir Relatorio</button>
+<button onclick="cerrarRelatorio()">Cerrar</button>
 
-    <script>
-        let cargas = JSON.parse(localStorage.getItem('cargas')) || [];
-        let editId = null;
+<div id="resumen"></div>
+<table id="tablaRelatorio"></table>
+</div>
 
-        // Mostrar lista de cargas
-        function mostrarTabla() {
-            const tabla = document.getElementById('tablaCargas');
-            tabla.innerHTML = `<tr>
+<script>
+let cargas = JSON.parse(localStorage.getItem('cargas')) || [];
+let editId = null;
+
+// Mostrar lista de cargas
+function mostrarTabla() {
+    const tabla = document.getElementById('tablaCargas');
+    tabla.innerHTML = `<tr>
 <th>ID</th><th>Camión</th><th>Chofer</th><th>Entidad</th><th>Peso Salida</th><th>Peso Llegada</th><th>Estado</th><th>Acciones</th>
 </tr>`;
-            cargas.forEach(c => {
-                let claseEstado = c.estado === "Aplicado" ? "aplicado" : "borrador";
-                tabla.innerHTML += `<tr class="${claseEstado}">
+    cargas.forEach(c => {
+        let claseEstado = c.estado === "Aplicado"? "aplicado":"borrador";
+        tabla.innerHTML += `<tr class="${claseEstado}">
 <td>${c.id}</td>
 <td>${c.camion}</td>
 <td>${c.chofer}</td>
-<td>${c.entidad || ''}</td>
+<td>${c.entidad||''}</td>
 <td>${c.peso_salida}</td>
 <td>${c.peso_llegada}</td>
 <td>${c.estado}</td>
 <td>
-<button onclick="editar(${c.id})" style="padding: 6px 12px; font-size: 12px;">✏️ Editar</button>
-<button class="btn-success" onclick="aplicar(${c.id})" style="padding: 6px 12px; font-size: 12px;">✅ Aplicar</button>
-<button class="btn-warning" onclick="desaplicar(${c.id})" style="padding: 6px 12px; font-size: 12px;">↩️ Desaplicar</button>
-<button class="btn-danger" onclick="eliminar(${c.id})" style="padding: 6px 12px; font-size: 12px;">🗑️ Eliminar</button>
+<button onclick="editar(${c.id})">Editar</button>
+<button onclick="aplicar(${c.id})">Aplicar</button>
+<button onclick="desaplicar(${c.id})">Desaplicar</button>
+<button onclick="eliminar(${c.id})">Eliminar</button>
 </td>
 </tr>`;
-            });
-        }
+    });
+}
 
-        // Botones principales
-        function nuevo() {
-            editId = null;
-            document.getElementById('editor').style.display = 'block';
-            document.getElementById('camion').value = '';
-            document.getElementById('chofer').value = '';
-            document.getElementById('entidad').value = '';
-            document.getElementById('pesoSalida').value = '';
-            document.getElementById('humSalida').value = '';
-            document.getElementById('impSalida').value = '';
-            document.getElementById('calSalida').value = '';
-            document.getElementById('pesoLlegada').value = '';
-            document.getElementById('humLlegada').value = '';
-            document.getElementById('impLlegada').value = '';
-            document.getElementById('calLlegada').value = '';
-            document.getElementById('descHum').value = 0;
-            document.getElementById('descImp').value = 0;
-            document.getElementById('descCal').value = 0;
-            calcular();
-        }
+// Botones principales
+function nuevo() {
+    editId = null;
+    document.getElementById('editor').style.display = 'block';
+    document.getElementById('camion').value = '';
+    document.getElementById('chofer').value = '';
+    document.getElementById('entidad').value = '';
+    document.getElementById('pesoSalida').value = '';
+    document.getElementById('humSalida').value = '';
+    document.getElementById('impSalida').value = '';
+    document.getElementById('calSalida').value = '';
+    document.getElementById('pesoLlegada').value = '';
+    document.getElementById('humLlegada').value = '';
+    document.getElementById('impLlegada').value = '';
+    document.getElementById('calLlegada').value = '';
+    document.getElementById('descHum').value = 0;
+    document.getElementById('descImp').value = 0;
+    document.getElementById('descCal').value = 0;
+    calcular();
+}
 
-        function editar(id) {
-            const c = cargas.find(x => x.id === id);
-            editId = id;
-            document.getElementById('editor').style.display = 'block';
-            document.getElementById('camion').value = c.camion;
-            document.getElementById('chofer').value = c.chofer;
-            document.getElementById('entidad').value = c.entidad || '';
-            document.getElementById('pesoSalida').value = c.peso_salida;
-            document.getElementById('humSalida').value = c.humedad_salida;
-            document.getElementById('impSalida').value = c.impureza_salida;
-            document.getElementById('calSalida').value = c.calidad_salida;
-            document.getElementById('pesoLlegada').value = c.peso_llegada;
-            document.getElementById('humLlegada').value = c.humedad_llegada;
-            document.getElementById('impLlegada').value = c.impureza_llegada;
-            document.getElementById('calLlegada').value = c.calidad_llegada;
-            document.getElementById('descHum').value = c.desc_humedad;
-            document.getElementById('descImp').value = c.desc_impureza;
-            document.getElementById('descCal').value = c.desc_calidad;
-            calcular();
-        }
+function editar(id) {
+    const c = cargas.find(x => x.id === id);
+    editId = id;
+    document.getElementById('editor').style.display = 'block';
+    document.getElementById('camion').value = c.camion;
+    document.getElementById('chofer').value = c.chofer;
+    document.getElementById('entidad').value = c.entidad||'';
+    document.getElementById('pesoSalida').value = c.peso_salida;
+    document.getElementById('humSalida').value = c.humedad_salida;
+    document.getElementById('impSalida').value = c.impureza_salida;
+    document.getElementById('calSalida').value = c.calidad_salida;
+    document.getElementById('pesoLlegada').value = c.peso_llegada;
+    document.getElementById('humLlegada').value = c.humedad_llegada;
+    document.getElementById('impLlegada').value = c.impureza_llegada;
+    document.getElementById('calLlegada').value = c.calidad_llegada;
+    document.getElementById('descHum').value = c.desc_humedad;
+    document.getElementById('descImp').value = c.desc_impureza;
+    document.getElementById('descCal').value = c.desc_calidad;
+    calcular();
+}
 
-        function aplicar(id) {
-            const c = cargas.find(x => x.id === id);
-            c.estado = "Aplicado";
-            localStorage.setItem('cargas', JSON.stringify(cargas));
-            mostrarTabla();
-        }
+function aplicar(id) {
+    const c = cargas.find(x => x.id === id);
+    c.estado = "Aplicado";
+    localStorage.setItem('cargas', JSON.stringify(cargas));
+    mostrarTabla();
+}
 
-        function desaplicar(id) {
-            const c = cargas.find(x => x.id === id);
-            c.estado = "Borrador";
-            localStorage.setItem('cargas', JSON.stringify(cargas));
-            mostrarTabla();
-        }
+function desaplicar(id) {
+    const c = cargas.find(x => x.id === id);
+    c.estado = "Borrador";
+    localStorage.setItem('cargas', JSON.stringify(cargas));
+    mostrarTabla();
+}
 
-        function eliminar(id) {
-            cargas = cargas.filter(x => x.id !== id);
-            localStorage.setItem('cargas', JSON.stringify(cargas));
-            mostrarTabla();
-        }
+function eliminar(id) {
+    cargas = cargas.filter(x => x.id !== id);
+    localStorage.setItem('cargas', JSON.stringify(cargas));
+    mostrarTabla();
+}
 
-        function cerrarEditor() { document.getElementById('editor').style.display = 'none'; }
+function cerrarEditor() { document.getElementById('editor').style.display = 'none'; }
 
-        // Cálculos automáticos
-        function calcular() {
-            const pesoSalida = parseFloat(document.getElementById('pesoSalida').value) || 0;
-            const pesoLlegada = parseFloat(document.getElementById('pesoLlegada').value) || 0;
-            const descHum = parseFloat(document.getElementById('descHum').value) || 0;
-            const descImp = parseFloat(document.getElementById('descImp').value) || 0;
-            const descCal = parseFloat(document.getElementById('descCal').value) || 0;
+// Cálculos automáticos
+function calcular() {
+    const pesoSalida = parseFloat(document.getElementById('pesoSalida').value) || 0;
+    const pesoLlegada = parseFloat(document.getElementById('pesoLlegada').value) || 0;
+    const descHum = parseFloat(document.getElementById('descHum').value) || 0;
+    const descImp = parseFloat(document.getElementById('descImp').value) || 0;
+    const descCal = parseFloat(document.getElementById('descCal').value) || 0;
 
-            document.getElementById('difPeso').innerText = (pesoSalida - pesoLlegada).toFixed(2);
-            document.getElementById('kgHum').innerText = (pesoLlegada * descHum / 100).toFixed(2);
-            document.getElementById('kgImp').innerText = (pesoLlegada * descImp / 100).toFixed(2);
-            document.getElementById('kgCal').innerText = (pesoLlegada * descCal / 100).toFixed(2);
-            document.getElementById('totalDesc').innerText = (pesoLlegada * (descHum + descImp + descCal) / 100).toFixed(2);
-        }
+    document.getElementById('difPeso').innerText = (pesoSalida - pesoLlegada).toFixed(2);
+    document.getElementById('kgHum').innerText = (pesoLlegada * descHum /100).toFixed(2);
+    document.getElementById('kgImp').innerText = (pesoLlegada * descImp /100).toFixed(2);
+    document.getElementById('kgCal').innerText = (pesoLlegada * descCal /100).toFixed(2);
+    document.getElementById('totalDesc').innerText = (pesoLlegada*(descHum+descImp+descCal)/100).toFixed(2);
+}
 
-        // Guardar o actualizar carga
-        function guardar() {
-            const fecha = new Date().toISOString().slice(0, 10);
-            const data = {
-                id: editId || (cargas.length + 1),
-                fecha: fecha,
-                camion: document.getElementById('camion').value,
-                chofer: document.getElementById('chofer').value,
-                entidad: document.getElementById('entidad').value,
-                peso_salida: parseFloat(document.getElementById('pesoSalida').value) || 0,
-                humedad_salida: parseFloat(document.getElementById('humSalida').value) || 0,
-                impureza_salida: parseFloat(document.getElementById('impSalida').value) || 0,
-                calidad_salida: parseFloat(document.getElementById('calSalida').value) || 0,
-                peso_llegada: parseFloat(document.getElementById('pesoLlegada').value) || 0,
-                humedad_llegada: parseFloat(document.getElementById('humLlegada').value) || 0,
-                impureza_llegada: parseFloat(document.getElementById('impLlegada').value) || 0,
-                calidad_llegada: parseFloat(document.getElementById('calLlegada').value) || 0,
-                desc_humedad: parseFloat(document.getElementById('descHum').value) || 0,
-                desc_impureza: parseFloat(document.getElementById('descImp').value) || 0,
-                desc_calidad: parseFloat(document.getElementById('descCal').value) || 0,
-                estado: "Borrador"
-            };
-            if (editId) {
-                const index = cargas.findIndex(x => x.id === editId);
-                cargas[index] = data;
-            } else {
-                cargas.push(data);
-            }
-            localStorage.setItem('cargas', JSON.stringify(cargas));
-            cerrarEditor();
-            mostrarTabla();
-        }
+// Guardar o actualizar carga
+function guardar() {
+    const fecha = new Date().toISOString().slice(0,10);
+    const data = {
+        id: editId || (cargas.length +1),
+        fecha: fecha,
+        camion: document.getElementById('camion').value,
+        chofer: document.getElementById('chofer').value,
+        entidad: document.getElementById('entidad').value,
+        peso_salida: parseFloat(document.getElementById('pesoSalida').value)||0,
+        humedad_salida: parseFloat(document.getElementById('humSalida').value)||0,
+        impureza_salida: parseFloat(document.getElementById('impSalida').value)||0,
+        calidad_salida: parseFloat(document.getElementById('calSalida').value)||0,
+        peso_llegada: parseFloat(document.getElementById('pesoLlegada').value)||0,
+        humedad_llegada: parseFloat(document.getElementById('humLlegada').value)||0,
+        impureza_llegada: parseFloat(document.getElementById('impLlegada').value)||0,
+        calidad_llegada: parseFloat(document.getElementById('calLlegada').value)||0,
+        desc_humedad: parseFloat(document.getElementById('descHum').value)||0,
+        desc_impureza: parseFloat(document.getElementById('descImp').value)||0,
+        desc_calidad: parseFloat(document.getElementById('descCal').value)||0,
+        estado: "Borrador"
+    };
+    if(editId){
+        const index = cargas.findIndex(x=>x.id===editId);
+        cargas[index] = data;
+    } else {
+        cargas.push(data);
+    }
+    localStorage.setItem('cargas', JSON.stringify(cargas));
+    cerrarEditor();
+    mostrarTabla();
+}
 
-        // Relatorio con filtros
-        function verRelatorio() {
-            document.getElementById('relatorio').style.display = 'block';
-            let totalPeso = 0, sumHum = 0, sumImp = 0, sumCal = 0;
+// Relatorio con filtros
+function verRelatorio() {
+    document.getElementById('relatorio').style.display = 'block';
+    let totalPeso = 0, sumHum=0, sumImp=0, sumCal=0;
 
-            const filtroFecha = document.getElementById('filtroFecha').value;
-            const filtroEntidad = document.getElementById('filtroEntidad').value.toLowerCase();
+    const filtroFecha = document.getElementById('filtroFecha').value;
+    const filtroEntidad = document.getElementById('filtroEntidad').value.toLowerCase();
 
-            let tabla = `<tr>
+    let tabla = `<tr>
 <th>ID</th><th>Camión</th><th>Chofer</th><th>Entidad</th>
 <th>Peso Salida</th><th>Peso Llegada</th><th>Dif Peso</th>
 <th>Humedad Salida</th><th>Humedad Llegada</th><th>Kg Desc Hum</th>
@@ -595,74 +239,72 @@
 <th>Total Desc</th><th>Estado</th>
 </tr>`;
 
-            const cargasFiltradas = cargas.filter(c => {
-                const coincideFecha = filtroFecha ? c.fecha === filtroFecha : true;
-                const coincideEntidad = filtroEntidad ? c.entidad?.toLowerCase().includes(filtroEntidad) : true;
-                return coincideFecha && coincideEntidad;
-            });
+    const cargasFiltradas = cargas.filter(c => {
+        const coincideFecha = filtroFecha ? c.fecha === filtroFecha : true;
+        const coincideEntidad = filtroEntidad ? c.entidad?.toLowerCase().includes(filtroEntidad) : true;
+        return coincideFecha && coincideEntidad;
+    });
 
-            cargasFiltradas.forEach(c => {
-                const difPeso = c.peso_salida - c.peso_llegada;
-                const kgHum = c.peso_llegada * c.desc_humedad / 100;
-                const kgImp = c.peso_llegada * c.desc_impureza / 100;
-                const kgCal = c.peso_llegada * c.desc_calidad / 100;
-                const totalDesc = kgHum + kgImp + kgCal;
+    cargasFiltradas.forEach(c=>{
+        const difPeso = c.peso_salida - c.peso_llegada;
+        const kgHum = c.peso_llegada * c.desc_humedad/100;
+        const kgImp = c.peso_llegada * c.desc_impureza/100;
+        const kgCal = c.peso_llegada * c.desc_calidad/100;
+        const totalDesc = kgHum + kgImp + kgCal;
 
-                totalPeso += c.peso_salida;
-                sumHum += c.humedad_salida * c.peso_salida;
-                sumImp += c.impureza_salida * c.peso_salida;
-                sumCal += c.calidad_salida * c.peso_salida;
+        totalPeso += c.peso_salida;
+        sumHum += c.humedad_salida*c.peso_salida;
+        sumImp += c.impureza_salida*c.peso_salida;
+        sumCal += c.calidad_salida*c.peso_salida;
 
-                let claseDesc = (totalDesc > 100) ? "descAlto" : "";
-                let claseEstado = c.estado === "Aplicado" ? "aplicado" : "borrador";
+        let claseDesc = (totalDesc > 100) ? "descAlto" : "";
+        let claseEstado = c.estado === "Aplicado"? "aplicado":"borrador";
 
-                tabla += `<tr class="${claseEstado}">
-<td>${c.id}</td><td>${c.camion}</td><td>${c.chofer}</td><td>${c.entidad || ''}</td>
+        tabla += `<tr class="${claseEstado}">
+<td>${c.id}</td><td>${c.camion}</td><td>${c.chofer}</td><td>${c.entidad||''}</td>
 <td>${c.peso_salida}</td><td>${c.peso_llegada}</td><td>${difPeso.toFixed(2)}</td>
 <td>${c.humedad_salida}</td><td>${c.humedad_llegada}</td><td>${kgHum.toFixed(2)}</td>
 <td>${c.impureza_salida}</td><td>${c.impureza_llegada}</td><td>${kgImp.toFixed(2)}</td>
 <td>${c.calidad_salida}</td><td>${c.calidad_llegada}</td><td>${kgCal.toFixed(2)}</td>
 <td class="${claseDesc}">${totalDesc.toFixed(2)}</td><td>${c.estado}</td>
 </tr>`;
-            });
+    });
 
-            const promHum = totalPeso ? (sumHum / totalPeso).toFixed(2) : 0;
-            const promImp = totalPeso ? (sumImp / totalPeso).toFixed(2) : 0;
-            const promCal = totalPeso ? (sumCal / totalPeso).toFixed(2) : 0;
+    const promHum = totalPeso? (sumHum/totalPeso).toFixed(2):0;
+    const promImp = totalPeso? (sumImp/totalPeso).toFixed(2):0;
+    const promCal = totalPeso? (sumCal/totalPeso).toFixed(2):0;
 
-            document.getElementById('resumen').innerHTML = `
-<h3>📈 Resumen General</h3>
-<p><strong>Peso total de salida:</strong> ${totalPeso.toFixed(2)} kg</p>
-<p><strong>Promedio Humedad:</strong> ${promHum}%</p>
-<p><strong>Promedio Impureza:</strong> ${promImp}%</p>
-<p><strong>Promedio Calidad:</strong> ${promCal}%</p>
+    document.getElementById('resumen').innerHTML = `
+<p>Peso total de salida: ${totalPeso.toFixed(2)} kg</p>
+<p>Promedio Humedad: ${promHum}%</p>
+<p>Promedio Impureza: ${promImp}%</p>
+<p>Promedio Calidad: ${promCal}%</p>
 `;
 
-            document.getElementById('tablaRelatorio').innerHTML = tabla;
-        }
+    document.getElementById('tablaRelatorio').innerHTML = tabla;
+}
 
-        function cerrarRelatorio() { document.getElementById('relatorio').style.display = 'none'; }
+function cerrarRelatorio() { document.getElementById('relatorio').style.display = 'none'; }
 
-        // Imprimir relatorio limpio
-        function imprimirRelatorio() {
-            const resumen = document.getElementById('resumen').innerHTML;
-            const tabla = document.getElementById('tablaRelatorio').outerHTML;
+// Imprimir relatorio limpio
+function imprimirRelatorio() {
+    const resumen = document.getElementById('resumen').innerHTML;
+    const tabla = document.getElementById('tablaRelatorio').outerHTML;
 
-            const ventana = window.open('', '', 'width=1200,height=800');
-            ventana.document.write('<html><head><title>Relatorio Diario</title>');
-            ventana.document.write('<style>table{border-collapse:collapse;width:100%;}th,td{border:1px solid #000;padding:5px;text-align:center;} h2,h3{margin:0;}</style>');
-            ventana.document.write('</head><body>');
-            ventana.document.write('<h2>Relatorio Diario</h2>');
-            ventana.document.write(resumen);
-            ventana.document.write(tabla);
-            ventana.document.write('</body></html>');
-            ventana.document.close();
-            ventana.print();
-        }
+    const ventana = window.open('', '', 'width=1200,height=800');
+    ventana.document.write('<html><head><title>Relatorio Diario</title>');
+    ventana.document.write('<style>table{border-collapse:collapse;width:100%;}th,td{border:1px solid #000;padding:5px;text-align:center;} h2,h3{margin:0;}</style>');
+    ventana.document.write('</head><body>');
+    ventana.document.write('<h2>Relatorio Diario</h2>');
+    ventana.document.write(resumen);
+    ventana.document.write(tabla);
+    ventana.document.write('</body></html>');
+    ventana.document.close();
+    ventana.print();
+}
 
-        mostrarTabla();
-    </script>
+mostrarTabla();
+</script>
 
 </body>
-
 </html>
