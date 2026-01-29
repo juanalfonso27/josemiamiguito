@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesaje de Desechos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #334155;
+            --text-dark: #0f172a;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--background);
+            color: var(--text);
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+        }
+
+        h2,
+        h3 {
+            color: var(--text-dark);
+            margin-top: 0;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 1px 2px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background: white;
+            border-color: var(--border);
+            color: var(--text-dark);
+        }
+
+        .btn-outline:hover {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        .btn-icon-only {
+            padding: 8px;
+            background: transparent;
+            color: #64748b;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-icon-only:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .btn-icon-only.delete:hover {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        /* Icons */
+        .icon {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Card/Table */
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 16px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            /* Smaller modal for simpler form */
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 32px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form */
+        .form-section {
+            margin-bottom: 24px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.875rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.875rem;
+            outline: none;
+            transition: 0.2s;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Stats Badge style if needed later */
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header class="no-print">
+            <h1>
+                <svg class="icon" style="color:var(--primary)" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Pesaje de Desechos
+            </h1>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-outline" onclick="window.logout()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Salir
+                </button>
+                <button class="btn btn-outline" onclick="window.location.href='index.html'">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Volver
+                </button>
+                <button class="btn btn-primary" onclick="nuevo()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Nuevo Pesaje
+                </button>
+            </div>
+        </header>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Camión</th>
+                        <th>Chofer</th>
+                        <th>Tipo Desecho</th>
+                        <th>Peso (Kg)</th>
+                        <th>Observaciones</th>
+                        <th class="no-print" style="text-align:right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="listaDesechos">
+                    <!-- Data loaded via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- EDITOR MODAL -->
+    <div id="editorModal" class="modal-overlay no-print">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
+                <h2>Registro de Desechos</h2>
+                <button class="btn-icon-only" onclick="cerrarEditor()"><svg class="icon" viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg></button>
+            </div>
+
+            <div class="grid">
+                <div class="field"><label>Camión</label><input id="camion" type="text" placeholder="Patente"></div>
+                <div class="field"><label>Chofer</label><input id="chofer" type="text" placeholder="Nombre"></div>
+                <div class="field"><label>Tipo de Desecho</label><input id="tipo" type="text"
+                        placeholder="Ej: Tierra, Granza"></div>
+                <div class="field"><label>Peso (Kg)</label><input id="peso" type="number" placeholder="0"></div>
+            </div>
+
+            <div class="field" style="margin-top: 16px;">
+                <label>Observaciones</label>
+                <textarea id="obs" rows="3"></textarea>
+            </div>
+
+            <div style="margin-top:24px; display:flex; justify-content:flex-end; gap:12px;">
+                <button class="btn btn-outline" onclick="cerrarEditor()">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy }
+            from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        // Same config as index.html
+        const firebaseConfig = {
+            apiKey: "AIzaSyCJJP8RKILKRByrt4Afi55VvSAzY75M7hE",
+            authDomain: "datos-de-jose-para-silo.firebaseapp.com",
+            projectId: "datos-de-jose-para-silo",
+            storageBucket: "datos-de-jose-para-silo.firebasestorage.app",
+            messagingSenderId: "410080189279",
+            appId: "1:410080189279:web:8cd03360742dc86c9a34ea",
+            measurementId: "G-5RDFFX8G86"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State
+        let currentUser = null;
+        let colRef = null;
+        let localDesechos = [];
+        let editId = null;
+
+        // Auth Listener
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                // Initialize User Data
+                colRef = collection(db, 'users', user.uid, 'desechos');
+
+                // Real-time listener
+                const q = query(colRef, orderBy('fecha', 'desc'));
+                onSnapshot(q, (snapshot) => {
+                    localDesechos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderTable();
+                });
+            } else {
+                // Redirect if not logged in
+                window.location.href = 'login.html';
+            }
+        });
+
+        window.logout = () => {
+            signOut(auth).then(() => window.location.href = 'login.html');
+        };
+
+        window.nuevo = () => {
+            editId = null;
+            document.getElementById('editorModal').classList.add('active');
+            clearForm();
+        };
+
+        window.cerrarEditor = () => {
+            document.getElementById('editorModal').classList.remove('active');
+        };
+
+        function clearForm() {
+            const ids = ['camion', 'chofer', 'tipo', 'peso', 'obs'];
+            ids.forEach(id => document.getElementById(id).value = '');
+        }
+
+        window.editar = (id) => {
+            const c = localDesechos.find(x => x.id === id);
+            if (!c) return;
+            editId = id;
+            document.getElementById('editorModal').classList.add('active');
+
+            document.getElementById('camion').value = c.camion;
+            document.getElementById('chofer').value = c.chofer;
+            document.getElementById('tipo').value = c.tipo;
+            document.getElementById('peso').value = c.peso;
+            document.getElementById('obs').value = c.observaciones || '';
+        };
+
+        window.guardar = async () => {
+            if (!colRef) return;
+
+            const data = {
+                fecha: new Date().toISOString().slice(0, 10),
+                camion: document.getElementById('camion').value,
+                chofer: document.getElementById('chofer').value,
+                tipo: document.getElementById('tipo').value,
+                peso: parseFloat(document.getElementById('peso').value) || 0,
+                observaciones: document.getElementById('obs').value
+            };
+
+            if (editId) {
+                await updateDoc(doc(db, 'users', currentUser.uid, 'desechos', editId), data);
+            } else {
+                await addDoc(colRef, data);
+            }
+            cerrarEditor();
+        };
+
+        window.eliminar = async (id) => {
+            if (confirm('¿Eliminar este registro?')) await deleteDoc(doc(db, 'users', currentUser.uid, 'desechos', id));
+        };
+
+        function renderTable() {
+            const tbody = document.getElementById('listaDesechos');
+            if (!tbody) return;
+            tbody.innerHTML = localDesechos.map(c => `
+            <tr>
+                <td>${c.fecha}</td>
+                <td><strong>${c.camion}</strong></td>
+                <td>${c.chofer}</td>
+                <td>${c.tipo}</td>
+                <td>${c.peso} kg</td>
+                <td>${c.observaciones || ''}</td>
+                <td style="text-align:right">
+                    <button class="btn-icon-only" onclick="editar('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+                    <button class="btn-icon-only delete" onclick="eliminar('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+                </td>
+            </tr>
+        `).join('');
+        };
+
+    </script>
+</body>
+
+</html>
