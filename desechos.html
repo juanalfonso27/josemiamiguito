@@ -316,7 +316,7 @@
                     </svg>
                     Salir
                 </button>
-                <button class="btn btn-outline" onclick="window.location.href='index.html'">
+                <button class="btn btn-outline" onclick="window.location.href='./index.html'">
                     <svg class="icon" viewBox="0 0 24 24">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
@@ -434,13 +434,13 @@
                 });
             } else {
                 // Redirect if not logged in
-                window.location.href = 'index.html';
+                window.location.href = './index.html';
             }
         });
 
         window.logout = () => {
             showLoader();
-            signOut(auth).then(() => window.location.href = 'login.html');
+            signOut(auth).then(() => window.location.href = './index.html');
         };
 
         window.nuevo = () => {

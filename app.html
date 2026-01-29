@@ -366,7 +366,7 @@
                     </svg>
                     Salir
                 </button>
-                <button class="btn btn-outline" onclick="window.location.href='desechos.html'">
+                <button class="btn btn-outline" onclick="window.location.href='./desechos.html'">
                     <svg class="icon" viewBox="0 0 24 24">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                         <polyline points="7 10 12 15 17 10" />
@@ -601,13 +601,13 @@
                 });
             } else {
                 // Redirect if not logged in
-                window.location.href = 'index.html';
+                window.location.href = './index.html';
             }
         });
 
         window.logout = () => {
             showLoader("Cerrando sesión...");
-            signOut(auth).then(() => window.location.href = 'login.html');
+            signOut(auth).then(() => window.location.href = './index.html');
         };
 
         window.nuevo = () => {
