@@ -247,10 +247,55 @@
                 display: none;
             }
         }
+
+        /* Loader */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .loader-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body>
+
+    <div id="loader" class="loader-overlay active">
+        <div class="spinner"></div>
+        <div style="font-weight: 500; color: var(--text-dark)">Cargando...</div>
+    </div>
 
     <div class="container">
         <header class="no-print">
@@ -360,6 +405,10 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // UI Helpers
+        const showLoader = () => document.getElementById('loader').classList.add('active');
+        const hideLoader = () => document.getElementById('loader').classList.remove('active');
+
         // State
         let currentUser = null;
         let colRef = null;
@@ -378,6 +427,10 @@
                 onSnapshot(q, (snapshot) => {
                     localDesechos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     renderTable();
+                    hideLoader();
+                }, (error) => {
+                    console.error(error);
+                    hideLoader();
                 });
             } else {
                 // Redirect if not logged in
@@ -386,6 +439,7 @@
         });
 
         window.logout = () => {
+            showLoader();
             signOut(auth).then(() => window.location.href = 'login.html');
         };
 
@@ -419,6 +473,7 @@
 
         window.guardar = async () => {
             if (!colRef) return;
+            showLoader();
 
             const data = {
                 fecha: new Date().toISOString().slice(0, 10),
@@ -429,16 +484,33 @@
                 observaciones: document.getElementById('obs').value
             };
 
-            if (editId) {
-                await updateDoc(doc(db, 'users', currentUser.uid, 'desechos', editId), data);
-            } else {
-                await addDoc(colRef, data);
+            try {
+                if (editId) {
+                    await updateDoc(doc(db, 'users', currentUser.uid, 'desechos', editId), data);
+                } else {
+                    await addDoc(colRef, data);
+                }
+                cerrarEditor();
+            } catch (error) {
+                console.error(error);
+                alert("Error al guardar");
+            } finally {
+                hideLoader();
             }
-            cerrarEditor();
         };
 
         window.eliminar = async (id) => {
-            if (confirm('¿Eliminar este registro?')) await deleteDoc(doc(db, 'users', currentUser.uid, 'desechos', id));
+            if (confirm('¿Eliminar este registro?')) {
+                showLoader();
+                try {
+                    await deleteDoc(doc(db, 'users', currentUser.uid, 'desechos', id));
+                } catch (error) {
+                    console.error(error);
+                    alert("Error al eliminar");
+                } finally {
+                    hideLoader();
+                }
+            }
         };
 
         function renderTable() {
