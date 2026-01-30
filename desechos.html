@@ -388,9 +388,9 @@
                 <textarea id="obs" rows="3"></textarea>
             </div>
 
-            <div style="margin-top:24px; display:flex; justify-content:flex-end; gap:12px;">
+                <div style="margin-top:24px; display:flex; justify-content:flex-end; gap:12px;">
                 <button class="btn btn-outline" onclick="cerrarEditor()">Cancelar</button>
-                <button class="btn btn-primary" onclick="guardar()">Guardar</button>
+                <button id="btnGuardar" class="btn btn-primary" onclick="guardar()"><span id="btnGuardarText">Guardar</span></button>
             </div>
         </div>
     </div>
@@ -487,6 +487,12 @@
 
         window.guardar = async () => {
             if (!colRef) return;
+
+            const btn = document.getElementById('btnGuardar');
+            const btnText = document.getElementById('btnGuardarText');
+            if (btn) btn.disabled = true;
+            if (btnText) btnText.textContent = 'Guardando...';
+
             showLoader();
 
             const fechaInput = document.getElementById('fecha') ? document.getElementById('fecha').value : '';
@@ -512,6 +518,8 @@
                 alert("Error al guardar");
             } finally {
                 hideLoader();
+                if (btn) btn.disabled = false;
+                if (btnText) btnText.textContent = 'Guardar';
             }
         };
 
