@@ -382,7 +382,6 @@
                 <thead>
                     <tr>
                             <th>Fecha</th>
-                            <th>Camión</th>
                             <th>Tipo Desecho</th>
                             <th>Peso (Kg)</th>
                             <th>Observaciones</th>
@@ -408,7 +407,6 @@
             </div>
 
             <div class="grid">
-                <div class="field"><label>Camión</label><input id="camion" type="text" placeholder="Patente"></div>
                 <div class="field"><label>Fecha</label><input id="fecha" type="date"></div>
                 <div class="field"><label>Tipo de Desecho</label>
                     <select id="tipo">
@@ -537,7 +535,7 @@
         };
 
         function clearForm() {
-            const ids = ['camion', 'fecha', 'tipo', 'peso', 'obs'];
+            const ids = ['fecha', 'tipo', 'peso', 'obs'];
             ids.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
@@ -550,7 +548,6 @@
             editId = id;
             document.getElementById('editorModal').classList.add('active');
 
-            document.getElementById('camion').value = c.camion;
             document.getElementById('fecha').value = c.fecha || '';
             document.getElementById('tipo').value = c.tipo;
             document.getElementById('peso').value = c.peso;
@@ -570,7 +567,6 @@
 
             const data = {
                 fecha: fechaVal,
-                camion: document.getElementById('camion').value,
                 tipo: document.getElementById('tipo').value,
                 peso: parseFloat(document.getElementById('peso').value) || 0,
                 observaciones: document.getElementById('obs').value
@@ -612,7 +608,6 @@
             tbody.innerHTML = localDesechos.map(c => `
             <tr>
                 <td>${c.fecha}</td>
-                <td><strong>${c.camion}</strong></td>
                 <td>${c.tipo}</td>
                 <td>${c.peso} kg</td>
                 <td>${c.observaciones || ''}</td>
@@ -647,7 +642,6 @@
 
                 return `<tr>
                     <td>${c.fecha}</td>
-                    <td>${c.camion}</td>
                     <td>${c.tipo}</td>
                     <td>${c.peso} kg</td>
                     <td>${c.observaciones || ''}</td>
@@ -670,7 +664,7 @@
                 </div>
                 <table>
                     <thead>
-                        <tr><th>Fecha</th><th>Camión</th><th>Tipo</th><th>Peso</th><th>Observaciones</th></tr>
+                        <tr><th>Fecha</th><th>Tipo</th><th>Peso</th><th>Observaciones</th></tr>
                     </thead>
                     <tbody>${rows}</tbody>
                 </table>
