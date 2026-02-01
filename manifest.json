@@ -7,12 +7,12 @@
   "theme_color": "#2563eb",
   "icons": [
     {
-      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=",
+      "src": "logo.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=",
+      "src": "logo.png",
       "sizes": "512x512",
       "type": "image/png"
     }
