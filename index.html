@@ -276,9 +276,7 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            if (!localStorage.getItem('pwa_install_dismissed')) {
-                installModal.style.display = 'flex';
-            }
+            installModal.style.display = 'flex';
         });
 
         acceptBtn && acceptBtn.addEventListener('click', async () => {
@@ -294,19 +292,16 @@
                 console.log('Usuario aceptó la instalación');
             } else {
                 console.log('Usuario rechazó la instalación');
-                localStorage.setItem('pwa_install_dismissed', '1');
             }
         });
 
         cancelBtn && cancelBtn.addEventListener('click', () => {
             installModal.style.display = 'none';
-            localStorage.setItem('pwa_install_dismissed', '1');
         });
 
         window.addEventListener('appinstalled', () => {
             installModal.style.display = 'none';
             console.log('App instalada');
-            localStorage.setItem('pwa_installed', '1');
         });
 
         // Register service worker
