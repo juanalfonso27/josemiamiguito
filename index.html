@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Silo Manager</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
     <style>
         :root {
             --primary: #2563eb;
@@ -157,6 +159,8 @@
                 transform: rotate(360deg);
             }
         }
+        /* Install banner */
+        #installBanner { display: none; }
     </style>
 </head>
 
@@ -165,6 +169,15 @@
     <div id="loader" class="loader-overlay">
         <div class="spinner"></div>
         <div style="font-weight: 500; color: var(--text-dark)">Cargando...</div>
+    </div>
+
+    <div id="installBanner" style="display:none;position:fixed;right:16px;bottom:16px;background:var(--surface);border:1px solid var(--border);padding:12px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.08);z-index:200;max-width:320px;">
+        <div style="font-weight:600;margin-bottom:8px">Instalar la aplicación</div>
+        <div style="font-size:0.9rem;margin-bottom:8px">Instala esta web como una app en tu dispositivo.</div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button id="installBtn" style="background:var(--primary);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer">Instalar</button>
+            <button id="dismissInstall" style="background:transparent;border:1px solid var(--border);padding:8px 12px;border-radius:8px;cursor:pointer">Cerrar</button>
+        </div>
     </div>
 
     <div class="login-card">
@@ -248,6 +261,52 @@
             const box = document.getElementById('errorBox');
             box.innerText = msg;
             box.style.display = 'block';
+        }
+    </script>
+
+    <script>
+        // PWA: beforeinstallprompt handling and service worker registration
+        let deferredPrompt = null;
+        const installBanner = document.getElementById('installBanner');
+        const installBtn = document.getElementById('installBtn');
+        const dismissBtn = document.getElementById('dismissInstall');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBanner.style.display = 'block';
+        });
+
+        installBtn && installBtn.addEventListener('click', async () => {
+            installBanner.style.display = 'none';
+            if (!deferredPrompt) {
+                alert('No es posible instalar desde aquí. Usa el menú del navegador.');
+                return;
+            }
+            deferredPrompt.prompt();
+            const choice = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            if (choice && choice.outcome === 'accepted') {
+                console.log('Usuario aceptó la instalación');
+            } else {
+                console.log('Usuario rechazó la instalación');
+            }
+        });
+
+        dismissBtn && dismissBtn.addEventListener('click', () => {
+            installBanner.style.display = 'none';
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBanner.style.display = 'none';
+            console.log('App instalada');
+        });
+
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then((reg) => console.log('SW registrado', reg))
+                .catch((err) => console.error('Error registrando SW', err));
         }
     </script>
 </body>
