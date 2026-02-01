@@ -171,12 +171,14 @@
         <div style="font-weight: 500; color: var(--text-dark)">Cargando...</div>
     </div>
 
-    <div id="installBanner" style="display:none;position:fixed;right:16px;bottom:16px;background:var(--surface);border:1px solid var(--border);padding:12px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.08);z-index:200;max-width:320px;">
-        <div style="font-weight:600;margin-bottom:8px">Instalar la aplicación</div>
-        <div style="font-size:0.9rem;margin-bottom:8px">Instala esta web como una app en tu dispositivo.</div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;">
-            <button id="installBtn" style="background:var(--primary);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer">Instalar</button>
-            <button id="dismissInstall" style="background:transparent;border:1px solid var(--border);padding:8px 12px;border-radius:8px;cursor:pointer">Cerrar</button>
+    <div id="installModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.6);align-items:center;justify-content:center;z-index:300;">
+        <div style="background:var(--surface);padding:24px;border-radius:16px;max-width:420px;width:90%;box-shadow:0 8px 24px rgba(0,0,0,0.2);border:1px solid var(--border);text-align:center;margin:auto;">
+            <div style="font-weight:700;font-size:1.1rem;margin-bottom:8px;">¿Quieres instalar la aplicación?</div>
+            <div style="margin-bottom:16px;color:var(--text);">Instala esta web como una app para abrirla más rápido desde tu dispositivo.</div>
+            <div style="display:flex;gap:8px;justify-content:center;">
+                <button id="installAccept" style="background:var(--primary);color:#fff;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;">Sí, instalar</button>
+                <button id="installCancel" style="background:transparent;border:1px solid var(--border);padding:10px 14px;border-radius:10px;cursor:pointer;">No, gracias</button>
+            </div>
         </div>
     </div>
 
@@ -265,20 +267,22 @@
     </script>
 
     <script>
-        // PWA: beforeinstallprompt handling and service worker registration
+        // PWA: beforeinstallprompt handling with full-screen modal and service worker registration
         let deferredPrompt = null;
-        const installBanner = document.getElementById('installBanner');
-        const installBtn = document.getElementById('installBtn');
-        const dismissBtn = document.getElementById('dismissInstall');
+        const installModal = document.getElementById('installModal');
+        const acceptBtn = document.getElementById('installAccept');
+        const cancelBtn = document.getElementById('installCancel');
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installBanner.style.display = 'block';
+            if (!localStorage.getItem('pwa_install_dismissed')) {
+                installModal.style.display = 'flex';
+            }
         });
 
-        installBtn && installBtn.addEventListener('click', async () => {
-            installBanner.style.display = 'none';
+        acceptBtn && acceptBtn.addEventListener('click', async () => {
+            installModal.style.display = 'none';
             if (!deferredPrompt) {
                 alert('No es posible instalar desde aquí. Usa el menú del navegador.');
                 return;
@@ -290,16 +294,19 @@
                 console.log('Usuario aceptó la instalación');
             } else {
                 console.log('Usuario rechazó la instalación');
+                localStorage.setItem('pwa_install_dismissed', '1');
             }
         });
 
-        dismissBtn && dismissBtn.addEventListener('click', () => {
-            installBanner.style.display = 'none';
+        cancelBtn && cancelBtn.addEventListener('click', () => {
+            installModal.style.display = 'none';
+            localStorage.setItem('pwa_install_dismissed', '1');
         });
 
         window.addEventListener('appinstalled', () => {
-            installBanner.style.display = 'none';
+            installModal.style.display = 'none';
             console.log('App instalada');
+            localStorage.setItem('pwa_installed', '1');
         });
 
         // Register service worker
