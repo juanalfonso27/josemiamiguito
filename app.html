@@ -402,7 +402,7 @@
                         <th>Camión</th>
                         <th>Chofer</th>
                         <th>Entidad</th>
-                        <th>Peso Neto</th>
+                        <th>Dif. Peso</th>
                         <th>Estado</th>
                         <th class="no-print" style="text-align:right">Acciones</th>
                     </tr>
@@ -468,22 +468,19 @@
             </div>
 
             <div class="form-section">
-                <h3 class="form-title">Descuentos Manuales (Porcentajes)</h3>
-                <div class="grid" style="grid-template-columns: repeat(3, 1fr);">
-                    <div class="field"><label>Hum. (%)</label><input id="descHum" type="number" oninput="calcular()">
-                    </div>
-                    <div class="field"><label>Imp. (%)</label><input id="descImp" type="number" oninput="calcular()">
-                    </div>
-                    <div class="field"><label>Cal. (%)</label><input id="descCal" type="number" oninput="calcular()">
-                    </div>
+                <h3 class="form-title">Descuento Destino</h3>
+                <div class="grid" style="grid-template-columns: 1fr;">
+                    <div class="field"><label>Descuento Destino (kg)</label><input id="descDestino" type="number" oninput="calcular()"></div>
                 </div>
             </div>
 
             <div class="stats-grid">
-                <div class="stat-row"><span>Diferencia Peso:</span> <span id="difPeso">0</span></div>
-                <div class="stat-row"><span>Desc. Humedad (kg):</span> <span id="kgHum">0</span></div>
-                <div class="stat-row"><span>Desc. Impureza (kg):</span> <span id="kgImp">0</span></div>
-                <div class="stat-row"><span>Desc. Calidad (kg):</span> <span id="kgCal">0</span></div>
+                <h4 style="margin:0 0 8px 0; color:#64748b; font-size:0.85rem;">Diferencias (Origen - Destino)</h4>
+                <div class="stat-row"><span>Dif. Peso (kg):</span> <span id="difPeso">0</span></div>
+                <div class="stat-row"><span>Dif. Humedad (%):</span> <span id="difHum">0</span></div>
+                <div class="stat-row"><span>Dif. Impureza (%):</span> <span id="difImp">0</span></div>
+                <div class="stat-row"><span>Dif. Calidad (%):</span> <span id="difCal">0</span></div>
+                <div class="stat-row" style="margin-top:12px;"><span>Desc. Destino (kg):</span> <span id="kgDestino">0</span></div>
                 <div class="stat-row total"><span>Total Descuentos (kg):</span> <span id="totalDesc">0</span></div>
             </div>
 
@@ -623,11 +620,16 @@
 
         function clearForm() {
             const ids = ['camion', 'chofer', 'entidad', 'pesoSalida', 'humSalida', 'impSalida', 'calSalida',
-                'pesoLlegada', 'humLlegada', 'impLlegada', 'calLlegada', 'descHum', 'descImp', 'descCal'];
+                'pesoLlegada', 'humLlegada', 'impLlegada', 'calLlegada', 'descDestino'];
             ids.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
             });
+        }
+
+        function getValNum(id) {
+            const el = document.getElementById(id);
+            return el ? (parseFloat(el.value) || 0) : 0;
         }
 
         window.editar = (id) => {
@@ -647,9 +649,26 @@
             document.getElementById('humLlegada').value = c.humedad_llegada;
             document.getElementById('impLlegada').value = c.impureza_llegada;
             document.getElementById('calLlegada').value = c.calidad_llegada;
-            document.getElementById('descHum').value = c.desc_humedad;
-            document.getElementById('descImp').value = c.desc_impureza;
-            document.getElementById('descCal').value = c.desc_calidad;
+            const elDescDestino = document.getElementById('descDestino');
+            let valKg = 0;
+            if (c.desc_destino !== undefined && c.desc_destino !== null) {
+                if (c.peso_llegada) {
+                    // Si el valor guardado era porcentaje (histórico), convertir a kg.
+                    if (c.desc_destino >= 0 && c.desc_destino <= 100) {
+                        valKg = (c.peso_llegada || 0) * c.desc_destino / 100;
+                    } else {
+                        // Ya está en kg
+                        valKg = c.desc_destino;
+                    }
+                } else {
+                    valKg = c.desc_destino;
+                }
+            } else {
+                // Fallback: convertir suma de porcentajes antiguos a kg
+                const pctSum = (c.desc_humedad || 0) + (c.desc_impureza || 0) + (c.desc_calidad || 0);
+                valKg = (c.peso_llegada || 0) * pctSum / 100;
+            }
+            if (elDescDestino) elDescDestino.value = Number(valKg.toFixed(2));
             calcular();
         };
 
@@ -670,9 +689,10 @@
                 humedad_llegada: parseFloat(document.getElementById('humLlegada').value) || 0,
                 impureza_llegada: parseFloat(document.getElementById('impLlegada').value) || 0,
                 calidad_llegada: parseFloat(document.getElementById('calLlegada').value) || 0,
-                desc_humedad: parseFloat(document.getElementById('descHum').value) || 0,
-                desc_impureza: parseFloat(document.getElementById('descImp').value) || 0,
-                desc_calidad: parseFloat(document.getElementById('descCal').value) || 0,
+                desc_destino: getValNum('descDestino'),
+                desc_humedad: 0,
+                desc_impureza: 0,
+                desc_calidad: 0,
                 estado: editId ? (localCargas.find(x => x.id === editId).estado) : "Borrador"
             };
 
@@ -724,21 +744,32 @@
         };
 
         window.calcular = () => {
+            // Valores Origen
+            const pesoSalida = parseFloat(document.getElementById('pesoSalida').value) || 0;
+            const humSalida = parseFloat(document.getElementById('humSalida').value) || 0;
+            const impSalida = parseFloat(document.getElementById('impSalida').value) || 0;
+            const calSalida = parseFloat(document.getElementById('calSalida').value) || 0;
+
+            // Valores Destino
             const pesoLlegada = parseFloat(document.getElementById('pesoLlegada').value) || 0;
-            const descHum = parseFloat(document.getElementById('descHum').value) || 0;
-            const descImp = parseFloat(document.getElementById('descImp').value) || 0;
-            const descCal = parseFloat(document.getElementById('descCal').value) || 0;
+            const humLlegada = parseFloat(document.getElementById('humLlegada').value) || 0;
+            const impLlegada = parseFloat(document.getElementById('impLlegada').value) || 0;
+            const calLlegada = parseFloat(document.getElementById('calLlegada').value) || 0;
 
-            const kHum = pesoLlegada * descHum / 100;
-            const kImp = pesoLlegada * descImp / 100;
-            const kCal = pesoLlegada * descCal / 100;
+            // Diferencias
+            document.getElementById('difPeso').innerText = (pesoSalida - pesoLlegada).toFixed(2);
+            document.getElementById('difHum').innerText = (humSalida - humLlegada).toFixed(2);
+            document.getElementById('difImp').innerText = (impSalida - impLlegada).toFixed(2);
+            document.getElementById('difCal').innerText = (calSalida - calLlegada).toFixed(2);
 
-            document.getElementById('difPeso').innerText = ((parseFloat(document.getElementById('pesoSalida').value) || 0) - pesoLlegada).toFixed(2);
+            // Descuento Destino (en kg)
+            const descDestino = getValNum('descDestino');
+            let kDest = descDestino;
+            if (kDest > pesoLlegada) kDest = pesoLlegada;
 
-            document.getElementById('kgHum').innerText = kHum.toFixed(2);
-            document.getElementById('kgImp').innerText = kImp.toFixed(2);
-            document.getElementById('kgCal').innerText = kCal.toFixed(2);
-            document.getElementById('totalDesc').innerText = (kHum + kImp + kCal).toFixed(2);
+            const elKgDestino = document.getElementById('kgDestino');
+            if (elKgDestino) elKgDestino.innerText = kDest.toFixed(2);
+            document.getElementById('totalDesc').innerText = kDest.toFixed(2);
         };
 
         function renderTable() {
@@ -753,7 +784,7 @@
                 <td><strong>${c.camion}</strong></td>
                 <td>${c.chofer}</td>
                 <td>${c.entidad || '-'}</td>
-                <td>${c.peso_llegada}<span style="font-size:0.75em;color:#94a3b8">kg</span></td>
+                <td>${((c.peso_salida || 0) - (c.peso_llegada || 0)).toFixed(0)}<span style="font-size:0.75em;color:#94a3b8">kg</span></td>
                 <td><span class="badge badge-${estadoClass}">${estado}</span></td>
                 <td style="text-align:right">
                     <button class="btn-icon-only" onclick="editar('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
@@ -796,7 +827,14 @@
                 totalPeso += c.peso_llegada || 0;
                 sumHum += (c.humedad_llegada || 0) * (c.peso_llegada || 0);
                 sumImp += (c.impureza_llegada || 0) * (c.peso_llegada || 0);
-                const totalKgDesc = (c.peso_llegada || 0) * ((c.desc_humedad || 0) + (c.desc_impureza || 0) + (c.desc_calidad || 0)) / 100;
+                let totalKgDesc = 0;
+                if (c.desc_destino !== undefined && c.desc_destino !== null && c.desc_destino > 0) {
+                    // ahora `desc_destino` se almacena en kg
+                    totalKgDesc = c.desc_destino;
+                } else {
+                    const pct = (c.desc_humedad || 0) + (c.desc_impureza || 0) + (c.desc_calidad || 0);
+                    totalKgDesc = (c.peso_llegada || 0) * (pct) / 100;
+                }
 
                 return `<tr>
                 <td>${c.camion}</td>

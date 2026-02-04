@@ -1,9 +1,5 @@
-const CACHE_NAME = 'silo-cache-v2';
+const CACHE_NAME = 'silo-cache-v3';
 const FILES_TO_CACHE = [
-  './',
-  './index.html',
-  './app.html',
-  './desechos.html'
 ];
 
 self.addEventListener('install', (event) => {
